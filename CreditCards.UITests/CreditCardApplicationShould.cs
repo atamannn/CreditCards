@@ -40,7 +40,8 @@ namespace CreditCards.UITests
             using (IWebDriver driver = new ChromeDriver())
             {
                 driver.Navigate().GoToUrl(Home_Url);
-               
+                driver.Manage().Window.Minimize();
+
                 var carouselNext = driver.FindElement(By.CssSelector("[data-slide=\"next\"]"));
                 carouselNext.Click();
 
