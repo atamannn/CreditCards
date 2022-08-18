@@ -1,4 +1,6 @@
-﻿using CreditCards.UITests.Helpers;
+﻿using ApprovalTests;
+using ApprovalTests.Reporters;
+using CreditCards.UITests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -172,15 +174,25 @@ namespace CreditCards.UITests
         }
 
         [Fact]
+        [UseReporter(typeof(BeyondCompareReporter))]
         public void RenderAboutPage()
         {
             using (IWebDriver driver = new ChromeDriver())
             {
                 driver.Navigate().GoToUrl(About_Url);
+
                 var screenShotDirver = (ITakesScreenshot)driver;
+
                 var screenShort = screenShotDirver.GetScreenshot();
+                
                 screenShort.SaveAsFile("aboutpage.bmp", ScreenshotImageFormat.Bmp);
+
+                var file = new FileInfo("aboutpage.bmp");
+
+                Approvals.Verify(file);
             }
         }
+
+
     }
 }
