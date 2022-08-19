@@ -16,14 +16,14 @@ namespace CreditCards.UITests.PageObjectModels
         }
 
         public ReadOnlyCollection<(string name, string interestRate)> Products
-        { 
-            get 
+        {
+            get
             {
                 var products = new List<(string name, string interestRate)>();
 
                 var productCells = _driver.FindElements(By.TagName("td"));
 
-                for (int i = 0; i < productCells.Count - 1; i +=2)
+                for (int i = 0; i < productCells.Count - 1; i += 2)
                 {
                     var name = productCells[i].Text;
                     var interestRate = productCells[i + 1].Text;
@@ -31,8 +31,18 @@ namespace CreditCards.UITests.PageObjectModels
                 }
 
                 return products.AsReadOnly();
-            } 
+            }
         }
+
+        public string GenerationToken => _driver.FindElement(By.Id("GenerationToken")).Text;
+
+        public bool IsCookieMessagePresent => _driver.FindElements(By.Id("CookiesBeingUsed")).Any();
+
+        public void ClickContactFooterLink() => _driver.FindElement(By.Id("ContactFooter")).Click();
+
+        public void ClickLiveChatFooterLink() => _driver.FindElement(By.Id("LiveChat")).Click();
+
+        public void ClickLearnAboutUsLink() => _driver.FindElement(By.Id("LearnAboutUs")).Click();
 
         public void NavigateTo()
         {
@@ -40,15 +50,28 @@ namespace CreditCards.UITests.PageObjectModels
             EnsurePageLoaded();
         }
 
-        private void EnsurePageLoaded()
+        public void EnsurePageLoaded(bool onlyCheckUrlStartsWithExpectedText = true)
         {
-            var pageHasLoaded = _driver.Url == HOME_URL && _driver.Title == HOME_TITLE;
-            var dsds = _driver.PageSource;
+            bool urlIsCorrect;
+
+            if (onlyCheckUrlStartsWithExpectedText)
+            {
+                urlIsCorrect = _driver.Url.StartsWith(HOME_URL);
+            }
+            else
+            {
+                urlIsCorrect = _driver.Url == HOME_URL;
+            }
+
+            var pageHasLoaded = urlIsCorrect && _driver.Title == HOME_TITLE;
+
             if (!pageHasLoaded)
             {
                 throw new Exception($"Failed to load page. Page URL = {_driver.Url}, " +
                     $"\n PageSource: {_driver.PageSource}");
             }
-        } 
+        }
+
+        
     }
 }
