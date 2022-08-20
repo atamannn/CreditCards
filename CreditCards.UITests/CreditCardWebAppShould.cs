@@ -4,16 +4,13 @@ using CreditCards.UITests.Helpers;
 using CreditCards.UITests.PageObjectModels;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
 using Xunit;
 
 namespace CreditCards.UITests
 {
     public class CreditCardWebAppShould
     {
-        const string Home_Url = "http://localhost:44108/";
         const string About_Url = "http://localhost:44108/Home/About";
-        const string Home_Title = "Home Page - Credit Cards";
 
         [Fact]
         [Trait("Category", "Smoke")]

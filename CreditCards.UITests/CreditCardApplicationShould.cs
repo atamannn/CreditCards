@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using CreditCards.UITests.PageObjectModels;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using Xunit;
@@ -20,16 +21,16 @@ namespace CreditCards.UITests
         }
 
         [Fact]
-        public void BeInitiatedFromHomePage()
+        public void BeInitiatedFromHomePage_NewLowRate()
         {
             using (IWebDriver driver = new ChromeDriver())
             {
-                driver.Navigate().GoToUrl(Home_Url);
-                var applyLink = driver.FindElement(By.Name("ApplyLowRate"));
-                applyLink.Click();
+                var homePage = new HomePage(driver);
+                homePage.NavigateTo();
 
-                Assert.Equal(Apply_Title, driver.Title);
-                Assert.Equal(Apply_Url, driver.Url);
+                var applicationPage = homePage.ClickApplyLowRateLink();
+
+                applicationPage.EnsurePageLoaded();
             }
 
         }
@@ -39,20 +40,15 @@ namespace CreditCards.UITests
         {
             using (IWebDriver driver = new ChromeDriver())
             {
-                driver.Navigate().GoToUrl(Home_Url);
-                driver.Manage().Window.Minimize();
+                var homePage = new HomePage(driver);
+                homePage.NavigateTo();
 
-                var carouselNext = driver.FindElement(By.CssSelector("[data-slide=\"next\"]"));
-                carouselNext.Click();
+                homePage.WaitForEasyApplicationCarouselPage();
 
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
+                var applicationPage = homePage.ClickApplyEasyApplicationLink();
 
-                var applyLink = wait.Until(d => d.FindElement(By.LinkText("Easy: Apply Now!")));
+                applicationPage.EnsurePageLoaded();
 
-                applyLink.Click();
-
-                Assert.Equal(Apply_Title, driver.Title);
-                Assert.Equal(Apply_Url, driver.Url);
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using System.Collections.ObjectModel;
 
 namespace CreditCards.UITests.PageObjectModels
@@ -9,6 +10,8 @@ namespace CreditCards.UITests.PageObjectModels
         const string HOME_TITLE = "Home Page - Credit Cards";
 
         private readonly IWebDriver _driver;
+
+        
 
         public HomePage(IWebDriver driver)
         {
@@ -43,6 +46,61 @@ namespace CreditCards.UITests.PageObjectModels
         public void ClickLiveChatFooterLink() => _driver.FindElement(By.Id("LiveChat")).Click();
 
         public void ClickLearnAboutUsLink() => _driver.FindElement(By.Id("LearnAboutUs")).Click();
+
+        public ApplicationPage ClickApplyLowRateLink()
+        {
+            _driver.FindElement(By.Name("ApplyLowRate")).Click();
+            return new ApplicationPage(_driver);
+        }
+
+        public void WaitForEasyApplicationCarouselPage()
+        {
+            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(11));
+
+            var applyLink = wait.Until(findEnableAndVisible);
+            wait.Until(Meth);
+
+        }
+
+        Func<IWebDriver, IWebElement> findEnableAndVisible = (d) =>
+        {
+            var e = d.FindElement(By.LinkText("Easy: Apply Now!"));
+
+            if (e is null)
+            {
+                throw new NotFoundException();
+            }
+
+            if (e.Enabled && e.Displayed)
+            {
+                return e;
+            }
+            throw new NotFoundException();
+        };
+
+        
+        public IWebElement Meth(IWebDriver webDriver)
+        {
+
+            var e = webDriver.FindElement(By.LinkText("Easy: Apply Now!"));
+
+            if (e is null)
+            {
+                throw new NotFoundException();
+            }
+
+            if (e.Enabled && e.Displayed)
+            {
+                return e;
+            }
+            throw new NotFoundException();
+        }
+
+        public ApplicationPage ClickApplyEasyApplicationLink()
+        {
+            _driver.FindElement(By.LinkText("Easy: Apply Now!")).Click();
+            return new ApplicationPage(_driver);
+        }
 
         public void NavigateTo()
         {
