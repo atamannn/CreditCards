@@ -1,12 +1,11 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using System.Collections.ObjectModel;
 
 namespace CreditCards.UITests.PageObjectModels
 {
-    public class ApplicationPage
+    public class ApplicationPage : Page
     {
-        const string PAGE_URL = "http://localhost:44108/Apply";
-        const string APPLICATION_PAGE_TITIE = "Credit Card Application - Credit Cards";
-
         private readonly IWebDriver _driver;
 
         public ApplicationPage(IWebDriver webDriver) 
@@ -14,32 +13,54 @@ namespace CreditCards.UITests.PageObjectModels
             _driver = webDriver;
         }
 
-        public void NavigateTo()
+        protected override string PageUrl => "http://localhost:44108/Apply";
+
+        protected override string PageTitle => "Credit Card Application - Credit Cards";
+
+        public void EnterFirstName(string firstName) => _driver.FindElement(By.Id("FirstName")).SendKeys(firstName);
+
+        public void EnterLastName(string lastName) => _driver.FindElement(By.Id("LastName")).SendKeys(lastName);
+
+        public void EnterFrequentFlyerNumber(string frequentFlyerNumner) => _driver.FindElement(By.Id("FrequentFlyerNumber")).SendKeys(frequentFlyerNumner);
+
+        public void EnterAge(string age) => _driver.FindElement(By.Id("Age")).SendKeys(age);
+
+        public void EnterCrossAnnualIncome(string crossAnnualIncome) => _driver.FindElement(By.Id("GrossAnnualIncome")).SendKeys(crossAnnualIncome);
+
+        public void ChooseMaritalStatusSingle() => _driver.FindElement(By.Id("Single")).Click();
+
+        public void ChoseBussinesSourceTV()
         {
-            _driver.Navigate().GoToUrl(PAGE_URL);
-            EnsurePageLoaded();
+            var businesSourceSelectElement = _driver.FindElement(By.Id("BusinessSource"));
+            var businesSource = new SelectElement(businesSourceSelectElement);
+            businesSource.SelectByValue("TV");
         }
 
-        public void EnsurePageLoaded(bool onlyCheckUrlStartsWithExpectedText = true)
+        public void AcceptTerms() => _driver.FindElement(By.Id("TermsAccepted")).Click();
+
+        public ApplicationCompletePage SubmitApplication() 
         {
-            bool urlIsCorrect;
+            _driver.FindElement(By.Id("SubmitApplication")).Click();
 
-            if (onlyCheckUrlStartsWithExpectedText)
-            {
-                urlIsCorrect = _driver.Url.StartsWith(PAGE_URL);
-            }
-            else
-            {
-                urlIsCorrect = _driver.Url == PAGE_URL;
-            }
+            return new ApplicationCompletePage(_driver);
+        }
 
-            var pageHasLoaded = urlIsCorrect && _driver.Title == APPLICATION_PAGE_TITIE;
+        public void ClearAge()
+        {
+            _driver.FindElement(By.Id("Age")).Clear();
+        }
 
-            if (!pageHasLoaded)
+        public ReadOnlyCollection<string> VaidationErrorMessages
+        {
+            get
             {
-                throw new Exception($"Failed to load page. Page URL = {_driver.Url}, " +
-                    $"\n PageSource: {_driver.PageSource}");
+                return _driver.FindElements(By.CssSelector(".validation-summary-errors > ul > li"))
+                    .Select(x => x.Text)
+                    .ToList()
+                    .AsReadOnly();
+
             }
         }
+
     }
 }

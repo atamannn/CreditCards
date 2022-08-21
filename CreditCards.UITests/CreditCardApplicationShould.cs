@@ -1,164 +1,166 @@
 ﻿using CreditCards.UITests.PageObjectModels;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace CreditCards.UITests
 {
-    public class CreditCardApplicationShould
+    public class CreditCardApplicationShould : IClassFixture<ChromeDriveFixture>
     {
         const string Home_Url = "http://localhost:44108/";
         const string Apply_Url = "http://localhost:44108/Apply";
         const string Apply_Title = "Credit Card Application - Credit Cards";
         
-        private readonly ITestOutputHelper _output;
+        private readonly ChromeDriveFixture _chromeDriveFixture;
 
-        public CreditCardApplicationShould(ITestOutputHelper output)
+        public CreditCardApplicationShould(ChromeDriveFixture chromeDriveFixture)
         {
-            _output = output;
+            _chromeDriveFixture = chromeDriveFixture;
+            _chromeDriveFixture.Driver.Manage().Cookies.DeleteAllCookies();
+            _chromeDriveFixture.Driver.Navigate().GoToUrl("about:blank");
         }
 
         [Fact]
         public void BeInitiatedFromHomePage_NewLowRate()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                var homePage = new HomePage(driver);
-                homePage.NavigateTo();
+            var homePage = new HomePage(_chromeDriveFixture.Driver);
+            homePage.NavigateTo();
 
-                var applicationPage = homePage.ClickApplyLowRateLink();
+            var applicationPage = homePage.ClickApplyLowRateLink();
 
-                applicationPage.EnsurePageLoaded();
-            }
+            applicationPage.EnsurePageLoaded();
 
         }
 
         [Fact]
         public void BeInitiatedFromHomePage_EasyApplication()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                var homePage = new HomePage(driver);
-                homePage.NavigateTo();
 
-                homePage.WaitForEasyApplicationCarouselPage();
+            var homePage = new HomePage(_chromeDriveFixture.Driver);
+            homePage.NavigateTo();
 
-                var applicationPage = homePage.ClickApplyEasyApplicationLink();
+            homePage.WaitForEasyApplicationCarouselPage(By.LinkText("Easy: Apply Now!"), TimeSpan.FromSeconds(11));
 
-                applicationPage.EnsurePageLoaded();
+            var applicationPage = homePage.ClickApplyEasyApplicationLink();
 
-            }
+            applicationPage.EnsurePageLoaded();
+
+
         }
 
         [Fact]
         public void BeInitiatedFromHomePage_CustomerService()
         {
-            Func<IWebDriver, IWebElement> findEnableAndVisible = (d) =>
-            {
-                var e = d.FindElement(By.ClassName("customer-service-apply-now"));
 
-                if (e is null)
-                {
-                    throw new NotFoundException();
-                }
+            var homePage = new HomePage(_chromeDriveFixture.Driver);
+            homePage.NavigateTo();
 
-                if(e.Enabled && e.Displayed)
-                {
-                    return e;
-                }
-                throw new NotFoundException();
-            };
+            homePage.WaitForEasyApplicationCarouselPage(By.ClassName("customer-service-apply-now"), TimeSpan.FromSeconds(35));
 
+            var applicationPage = homePage.ClickApplyNowlink();
 
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                driver.Navigate().GoToUrl(Home_Url);
+            applicationPage.EnsurePageLoaded();
 
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(35));
-                var applyLink = wait.Until(findEnableAndVisible);
-
-                _output.WriteLine($"{DateTime.Now.ToLongTimeString()} Found element Displayed =  {applyLink.Displayed}, Enabled = {applyLink.Enabled}");
-
-                applyLink.Click();
-
-                Assert.Equal(Apply_Title, driver.Title);
-                Assert.Equal(Apply_Url, driver.Url);
-            }
         }
 
         [Fact]
         public void BeInitiatedFromHomePage_RandomCreating()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                driver.Navigate().GoToUrl(Home_Url);
 
-                var randomGreetingApplyLink = driver.FindElement(By.PartialLinkText("Apply Now!"));
-                randomGreetingApplyLink.Click();
+            _chromeDriveFixture.Driver.Navigate().GoToUrl(Home_Url);
 
-                Assert.Equal(Apply_Title, driver.Title);
-                Assert.Equal(Apply_Url, driver.Url);
-            }
+            var randomGreetingApplyLink = _chromeDriveFixture.Driver.FindElement(By.PartialLinkText("Apply Now!"));
+            randomGreetingApplyLink.Click();
+
+            Assert.Equal(Apply_Title, _chromeDriveFixture.Driver.Title);
+            Assert.Equal(Apply_Url, _chromeDriveFixture.Driver.Url);
+
         }
 
         [Fact]
         public void BeInitiatedFromHomePage_RandomCreating_Using_XPath()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                driver.Navigate().GoToUrl(Home_Url);
 
-                var randomGreetingApplyLink = driver.FindElement(By.XPath("//a[text()[contains(.,'- Apply Now!')]]"));
-                randomGreetingApplyLink.Click();
+            _chromeDriveFixture.Driver.Navigate().GoToUrl(Home_Url);
 
-                Assert.Equal(Apply_Title, driver.Title);
-                Assert.Equal(Apply_Url, driver.Url);
-            }
+            var randomGreetingApplyLink = _chromeDriveFixture.Driver.FindElement(By.XPath("//a[text()[contains(.,'- Apply Now!')]]"));
+            randomGreetingApplyLink.Click();
+
+            Assert.Equal(Apply_Title, _chromeDriveFixture.Driver.Title);
+            Assert.Equal(Apply_Url, _chromeDriveFixture.Driver.Url);
+
         }
 
         [Fact]
         public void BeSubmitedWhenValid()
         {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                driver.Navigate().GoToUrl(Apply_Url);
+            const string FIRST_NAME = "Sarah";
+            const string LAST_NAME = "Smith";
+            const string NUMBER = "123456-A";
+            const string AGE = "18";
+            const string INCOME = "50000";
 
-                driver.FindElement(By.Id("FirstName")).SendKeys("Sarah");
-                driver.FindElement(By.Id("LastName")).SendKeys("Smith");
-                driver.FindElement(By.Id("FrequentFlyerNumber")).SendKeys("123456-A");
-                driver.FindElement(By.Id("Age")).SendKeys("18");
-                driver.FindElement(By.Id("GrossAnnualIncome")).SendKeys("50000");
-                driver.FindElement(By.Id("Single")).Click();
 
-                var businesSourceSelectElement = driver.FindElement(By.Id("BusinessSource"));
-                var businesSource = new SelectElement(businesSourceSelectElement);
-                
-                Assert.Equal("I'd Rather Not Say", businesSource.SelectedOption.Text);
 
-                foreach(var option in businesSource.Options)
-                {
-                    _output.WriteLine($"Value: {option.GetAttribute("value")}, Text: {option.Text}");
-                }
+            var applycationPage = new ApplicationPage(_chromeDriveFixture.Driver);
+            applycationPage.NavigateTo();
 
-                businesSource.SelectByValue("Email");
-                businesSource.SelectByText("Internet Search");
-                businesSource.SelectByIndex(4);
+            applycationPage.EnterFirstName(FIRST_NAME);
+            applycationPage.EnterLastName(LAST_NAME);
+            applycationPage.EnterFrequentFlyerNumber(NUMBER);
+            applycationPage.EnterAge(AGE);
+            applycationPage.EnterCrossAnnualIncome(INCOME);
+            applycationPage.ChooseMaritalStatusSingle();
+            applycationPage.ChoseBussinesSourceTV();
+            applycationPage.AcceptTerms();
 
-                driver.FindElement(By.Id("TermsAccepted")).Click();
+            var applicationCompletePage = applycationPage.SubmitApplication();
 
-                driver.FindElement(By.Id("Single")).Submit();
+            applicationCompletePage.EnsurePageLoaded();
 
-                Assert.StartsWith("Application Complete", driver.Title);
-                Assert.Equal("ReferredToHuman", driver.FindElement(By.Id("Decision")).Text);
-                Assert.NotEmpty(driver.FindElement(By.Id("ReferenceNumber")).Text);
-                Assert.Equal("Sarah Smith", driver.FindElement(By.Id("FullName")).Text);
-                Assert.Equal("18", driver.FindElement(By.Id("Age")).Text);
-                Assert.Equal("50000", driver.FindElement(By.Id("Income")).Text);
-                Assert.Equal("Single", driver.FindElement(By.Id("RelationshipStatus")).Text);
-                Assert.Equal("TV", driver.FindElement(By.Id("BusinessSource")).Text);
-            }
+            Assert.Equal("ReferredToHuman", applicationCompletePage.Decision);
+            Assert.NotEmpty(applicationCompletePage.ReferenceNumber);
+            Assert.Equal($"{FIRST_NAME} {LAST_NAME}", applicationCompletePage.FullName);
+            Assert.Equal(AGE, applicationCompletePage.Age);
+            Assert.Equal(INCOME, applicationCompletePage.Income);
+            Assert.Equal("Single", applicationCompletePage.RelationshipStatus);
+            Assert.Equal("TV", applicationCompletePage.BusinessSource);
+
+        }
+
+        [Fact]
+        public void BeSubmitetWhenValidationErrorsCorrected()
+        {
+            const string FIRST_NAME = "Sarah";
+            const string INVALID_AGE = "17";
+            const string VALID_AGE = "18";
+
+
+            var applycationPage = new ApplicationPage(_chromeDriveFixture.Driver);
+            applycationPage.NavigateTo();
+
+            applycationPage.EnterFirstName(FIRST_NAME);
+            // Don't entre last name
+            applycationPage.EnterFrequentFlyerNumber("123456-A");
+            applycationPage.EnterAge(INVALID_AGE);
+            applycationPage.EnterCrossAnnualIncome("50000");
+            applycationPage.ChooseMaritalStatusSingle();
+            applycationPage.ChoseBussinesSourceTV();
+            applycationPage.AcceptTerms();
+            applycationPage.SubmitApplication();
+
+            // Assert that validation failed
+            Assert.Equal(2, applycationPage.VaidationErrorMessages.Count);
+            Assert.Contains("Please provide a last name", applycationPage.VaidationErrorMessages);
+            Assert.Contains("You must be at least 18 years old", applycationPage.VaidationErrorMessages);
+
+            // Fix Errors
+            applycationPage.EnterLastName("Smith");
+            applycationPage.ClearAge();
+            applycationPage.EnterAge(VALID_AGE);
+
+            var applicationCopitePage = applycationPage.SubmitApplication();
+            applicationCopitePage.EnsurePageLoaded();
+
         }
     }
 }

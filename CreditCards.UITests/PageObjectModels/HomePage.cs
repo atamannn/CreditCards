@@ -4,19 +4,18 @@ using System.Collections.ObjectModel;
 
 namespace CreditCards.UITests.PageObjectModels
 {
-    public class HomePage
+    public class HomePage : Page
     {
-        const string HOME_URL = "http://localhost:44108/";
-        const string HOME_TITLE = "Home Page - Credit Cards";
-
         private readonly IWebDriver _driver;
-
-        
 
         public HomePage(IWebDriver driver)
         {
             _driver = driver;
         }
+
+        protected override string PageUrl => "http://localhost:44108/";
+
+        protected override string PageTitle => "Home Page - Credit Cards";
 
         public ReadOnlyCollection<(string name, string interestRate)> Products
         {
@@ -53,83 +52,42 @@ namespace CreditCards.UITests.PageObjectModels
             return new ApplicationPage(_driver);
         }
 
-        public void WaitForEasyApplicationCarouselPage()
+        public void WaitForEasyApplicationCarouselPage(By by, TimeSpan timeOut)
         {
-            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(11));
+            Func<IWebDriver, IWebElement> findEnableAndVisible = (d) =>
+            {
+                var e = d.FindElement(by);
+
+                if (e is null)
+                {
+                    throw new NotFoundException();
+                }
+
+                if (e.Enabled && e.Displayed)
+                {
+                    return e;
+                }
+                throw new NotFoundException();
+            };
+
+            var wait = new WebDriverWait(_driver, timeOut);
 
             var applyLink = wait.Until(findEnableAndVisible);
-            wait.Until(Meth);
 
-        }
-
-        Func<IWebDriver, IWebElement> findEnableAndVisible = (d) =>
-        {
-            var e = d.FindElement(By.LinkText("Easy: Apply Now!"));
-
-            if (e is null)
-            {
-                throw new NotFoundException();
-            }
-
-            if (e.Enabled && e.Displayed)
-            {
-                return e;
-            }
-            throw new NotFoundException();
-        };
-
-        
-        public IWebElement Meth(IWebDriver webDriver)
-        {
-
-            var e = webDriver.FindElement(By.LinkText("Easy: Apply Now!"));
-
-            if (e is null)
-            {
-                throw new NotFoundException();
-            }
-
-            if (e.Enabled && e.Displayed)
-            {
-                return e;
-            }
-            throw new NotFoundException();
         }
 
         public ApplicationPage ClickApplyEasyApplicationLink()
         {
+            var script = @"document.evaluate('//a[text()[contains(.,\'Easy: Apply Now!\')]]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();";
             _driver.FindElement(By.LinkText("Easy: Apply Now!")).Click();
             return new ApplicationPage(_driver);
         }
 
-        public void NavigateTo()
+        public ApplicationPage ClickApplyNowlink()
         {
-            _driver.Navigate().GoToUrl(HOME_URL);
-            EnsurePageLoaded();
+            _driver.FindElement(By.ClassName("customer-service-apply-now")).Click();
+            return new ApplicationPage(_driver);
         }
 
-        public void EnsurePageLoaded(bool onlyCheckUrlStartsWithExpectedText = true)
-        {
-            bool urlIsCorrect;
-
-            if (onlyCheckUrlStartsWithExpectedText)
-            {
-                urlIsCorrect = _driver.Url.StartsWith(HOME_URL);
-            }
-            else
-            {
-                urlIsCorrect = _driver.Url == HOME_URL;
-            }
-
-            var pageHasLoaded = urlIsCorrect && _driver.Title == HOME_TITLE;
-
-            if (!pageHasLoaded)
-            {
-                throw new Exception($"Failed to load page. Page URL = {_driver.Url}, " +
-                    $"\n PageSource: {_driver.PageSource}");
-            }
-        }
-
-        
     }
 }
