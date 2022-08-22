@@ -11,6 +11,7 @@ namespace CreditCards.Controllers
         [ResponseCache(NoStore = true)]
         public IActionResult Index()
         {
+
             string[] randomGreetings = { "Hi", "Hey", "Yo" };
 
             int rndGreetingIndex = new Random().Next(0, randomGreetings.Length);
