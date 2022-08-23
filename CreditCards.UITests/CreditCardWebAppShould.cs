@@ -99,7 +99,6 @@ namespace CreditCards.UITests
                 Assert.Equal("Live chat is currently closed.", alert.Text);
 
                 alert.Accept();
-
             }
         }
 
@@ -135,7 +134,6 @@ namespace CreditCards.UITests
                 alertBox.Dismiss();
 
                 homePage.EnsurePageLoaded();
-
             }
         }
 
@@ -179,7 +177,5 @@ namespace CreditCards.UITests
                 Approvals.Verify(file);
             }
         }
-
-
     }
 }

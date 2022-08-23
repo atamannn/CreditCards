@@ -28,7 +28,6 @@ namespace CreditCards.UITests
             var applicationPage = homePage.ClickApplyLowRateLink();
 
             applicationPage.EnsurePageLoaded();
-
         }
 
         [Fact]
@@ -43,8 +42,6 @@ namespace CreditCards.UITests
             var applicationPage = homePage.ClickApplyEasyApplicationLink();
 
             applicationPage.EnsurePageLoaded();
-
-
         }
 
         [Fact]
@@ -59,7 +56,6 @@ namespace CreditCards.UITests
             var applicationPage = homePage.ClickApplyNowlink();
 
             applicationPage.EnsurePageLoaded();
-
         }
 
         [Fact]
@@ -73,7 +69,6 @@ namespace CreditCards.UITests
 
             Assert.Equal(Apply_Title, _chromeDriveFixture.Driver.Title);
             Assert.Equal(Apply_Url, _chromeDriveFixture.Driver.Url);
-
         }
 
         [Fact]
@@ -87,7 +82,6 @@ namespace CreditCards.UITests
 
             Assert.Equal(Apply_Title, _chromeDriveFixture.Driver.Title);
             Assert.Equal(Apply_Url, _chromeDriveFixture.Driver.Url);
-
         }
 
         [Fact]
@@ -124,7 +118,6 @@ namespace CreditCards.UITests
             Assert.Equal(INCOME, applicationCompletePage.Income);
             Assert.Equal("Single", applicationCompletePage.RelationshipStatus);
             Assert.Equal("TV", applicationCompletePage.BusinessSource);
-
         }
 
         [Fact]
@@ -133,7 +126,6 @@ namespace CreditCards.UITests
             const string FIRST_NAME = "Sarah";
             const string INVALID_AGE = "17";
             const string VALID_AGE = "18";
-
 
             var applycationPage = new ApplicationPage(_chromeDriveFixture.Driver);
             applycationPage.NavigateTo();
@@ -160,7 +152,6 @@ namespace CreditCards.UITests
 
             var applicationCopitePage = applycationPage.SubmitApplication();
             applicationCopitePage.EnsurePageLoaded();
-
         }
     }
 }
