@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="CreditCardWebAppShould.RenderAboutPage.approved.bmp">
+    <None Update="Tests\CreditCardWebAppShould.RenderAboutPage.approved.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -5,6 +5,7 @@ using CreditCards.UITests.PageObjectModels;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CreditCards.UITests
 {
@@ -12,6 +13,13 @@ namespace CreditCards.UITests
     {
         const string About_Url = "http://localhost:44108/Home/About";
 
+        private readonly ITestOutputHelper _output;
+        
+        public CreditCardWebAppShould(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+       
         [Fact]
         [Trait("Category", "Smoke")]
         public void LoadHomePage()
@@ -150,7 +158,7 @@ namespace CreditCards.UITests
 
                 Assert.False(homePage.IsCookieMessagePresent);
 
-               
+
                 driver.Manage().Cookies.DeleteCookieNamed("acceptedCookies");
                 driver.Navigate().Refresh();
 
