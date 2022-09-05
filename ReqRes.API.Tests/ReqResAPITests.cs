@@ -26,8 +26,11 @@ namespace CreditCards.UITests.Tests
 
             //-- Asset
             Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Email, actual.Email);
+            Assert.Equal(expected.FirstName, actual.FirstName);
+            Assert.Equal(expected.LastName, actual.LastName);
+            Assert.Equal(expected.Avatar, actual.Avatar);
 
         }
-        
     }
 }
